@@ -2,10 +2,7 @@ services:
   - type: worker
     name: discord-music-bot
     env: python
-    buildCommand: |
-      chmod +x install_ffmpeg.sh
-      ./install_ffmpeg.sh
-      pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt
     startCommand: python main.py
     envVars:
       - key: DISCORD_API_TOKEN
