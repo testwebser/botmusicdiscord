@@ -41,8 +41,9 @@ FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconne
 def get_ffmpeg_path():
     """Get the path to the ffmpeg executable."""
     # Priority 1: Check system PATH (Linux/Railway/Installed Windows)
-    if shutil.which("ffmpeg"):
-        return "ffmpeg"
+    system_ffmpeg = shutil.which("ffmpeg")
+    if system_ffmpeg:
+        return system_ffmpeg
     
     # Priority 2: Check local bin (Portable Windows)
     if os.path.exists("bin/ffmpeg.exe"):
