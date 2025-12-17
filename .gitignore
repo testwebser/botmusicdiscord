@@ -1,0 +1,21 @@
+.env
+.idea
+.vscode
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+
+# Project specific
+bin/
+debug_ytdlp.py
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
