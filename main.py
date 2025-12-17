@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 from yt_dlp import YoutubeDL
 
 import os
+import shutil
 
 import discord.opus
 
@@ -36,6 +37,16 @@ mqueue = []
 YDL_OPTIONS = {'format': 'm4a/bestaudio/best', 'noplaylist': True}
 FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
                   'options': '-vn'}
+
+def get_ffmpeg_path():
+    """Get the path to the ffmpeg executable."""
+    if shutil.which("ffmpeg"):
+        return "ffmpeg"
+    if os.path.exists("bin/ffmpeg.exe"):
+        return "bin/ffmpeg.exe"
+    return "ffmpeg"  # Fallback
+
+FFMPEG_EXECUTABLE = get_ffmpeg_path()
 
 # Voice channel
 vc = None
@@ -155,7 +166,7 @@ def play_next():
             m_url = mqueue[0][0]['source']
             # Check if vc is connected before trying to play
             if vc and vc.is_connected():
-                vc.play(discord.FFmpegPCMAudio(m_url, executable="bin/ffmpeg.exe", **FFMPEG_OPTIONS), after=lambda e: play_next())
+                vc.play(discord.FFmpegPCMAudio(m_url, executable=FFMPEG_EXECUTABLE, **FFMPEG_OPTIONS), after=lambda e: play_next())
                 asyncio.run_coroutine_threadsafe(send_now_playing_message(mqueue[0][0]['title']), bot.loop)
             else:
                 is_playing = False
@@ -190,7 +201,7 @@ async def play_music():
 
         print(mqueue)
         try:
-            vc.play(discord.FFmpegPCMAudio(m_url, executable="bin/ffmpeg.exe", **FFMPEG_OPTIONS), after=lambda e: play_next())
+            vc.play(discord.FFmpegPCMAudio(m_url, executable=FFMPEG_EXECUTABLE, **FFMPEG_OPTIONS), after=lambda e: play_next())
         except ClientException as e:
             print(f"Ignoring exception: {e}")
             pass
