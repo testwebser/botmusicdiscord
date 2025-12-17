@@ -40,12 +40,16 @@ FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconne
 
 def get_ffmpeg_path():
     """Get the path to the ffmpeg executable."""
-    # Priority 1: Check system PATH (Linux/Railway/Installed Windows)
+    # Priority 1: Render.com custom path
+    if os.path.exists("/opt/render/project/src/bin/ffmpeg"):
+        return "/opt/render/project/src/bin/ffmpeg"
+    
+    # Priority 2: Check system PATH (Linux/Railway/Installed Windows)
     system_ffmpeg = shutil.which("ffmpeg")
     if system_ffmpeg:
         return system_ffmpeg
     
-    # Priority 2: Check local bin (Portable Windows)
+    # Priority 3: Check local bin (Portable Windows)
     if os.path.exists("bin/ffmpeg.exe"):
         return "bin/ffmpeg.exe"
     
