@@ -40,13 +40,18 @@ FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconne
 
 def get_ffmpeg_path():
     """Get the path to the ffmpeg executable."""
+    # Priority 1: Check system PATH (Linux/Railway/Installed Windows)
     if shutil.which("ffmpeg"):
         return "ffmpeg"
+    
+    # Priority 2: Check local bin (Portable Windows)
     if os.path.exists("bin/ffmpeg.exe"):
         return "bin/ffmpeg.exe"
+    
     return "ffmpeg"  # Fallback
 
 FFMPEG_EXECUTABLE = get_ffmpeg_path()
+print(f"🎬 USING FFMPEG PATH: {FFMPEG_EXECUTABLE}")
 
 # Voice channel
 vc = None
