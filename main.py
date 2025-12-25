@@ -87,7 +87,7 @@ async def on_ready():
     print('🎵 Connecting to Lavalink...')
     
     # Connect to Lavalink node
-    node = wavelink.Node(uri='https://lavalinkv4.serenetia.com', password='https://dsc.gg/ajidevserver')
+    node = wavelink.Node(uri='https://pool-sg.alfari.id:443', password='alfari')
     await wavelink.Pool.connect(nodes=[node], client=bot, cache_capacity=100)
     print('✅ Connected to Lavalink!')
 
