@@ -87,14 +87,19 @@ async def on_ready():
     print('🎵 Connecting to Lavalink...')
     
     # Connect to Lavalink node
-    node = wavelink.Node(uri='https://lava-v4.ajieblogs.eu.org:443', password='https://dsc.gg/ajidevserver')
+    node = wavelink.Node(uri='https://lavalinkv4.serenetia.com', password='https://dsc.gg/ajidevserver')
     await wavelink.Pool.connect(nodes=[node], client=bot, cache_capacity=100)
     print('✅ Connected to Lavalink!')
 
 
-@tasks.loop(seconds=1)
+@tasks.loop(seconds=60)
 async def status():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="Music via Lavalink"))
+    """Update bot presence - runs every 60 seconds to avoid rate limits and connection issues"""
+    try:
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="Music via Lavalink"))
+    except Exception:
+        # Ignore errors during reconnection (ClientConnectionResetError etc.)
+        pass
 
 
 # Event when track ends
@@ -134,14 +139,29 @@ async def play(ctx, *, query: str):
         return
     
     # Get or create player
-    if not ctx.voice_client:
-        player: wavelink.Player = await ctx.author.voice.channel.connect(cls=wavelink.Player)
-    else:
-        player: wavelink.Player = ctx.voice_client
-        
-        # Move to user's channel if different
-        if player.channel != ctx.author.voice.channel:
-            await player.move_to(ctx.author.voice.channel)
+    try:
+        if not ctx.voice_client:
+            player: wavelink.Player = await ctx.author.voice.channel.connect(cls=wavelink.Player)
+        else:
+            player: wavelink.Player = ctx.voice_client
+            
+            # Move to user's channel if different
+            if player.channel != ctx.author.voice.channel:
+                await player.move_to(ctx.author.voice.channel)
+    except wavelink.exceptions.ChannelTimeoutException:
+        embed = discord.Embed(
+            description="❌ Could not connect to voice channel (timeout). Please try again.",
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=embed, delete_after=15)
+        return
+    except Exception as e:
+        embed = discord.Embed(
+            description=f"❌ Failed to connect: {str(e)[:100]}",
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=embed, delete_after=15)
+        return
     
     # Search for track
     tracks: wavelink.Search = await wavelink.Playable.search(query)
